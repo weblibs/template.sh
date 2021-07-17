@@ -21,9 +21,7 @@ Running `template` in a folder will make it read and process all files,
 recursively, so be carefull, and will generate the same structure in the
 *out* folder. The best way is to point to a folder:
 
-```
-template static
-```
+`template static`
 
 will process all files inside *static/* and write them into *out/*.
 
@@ -93,7 +91,8 @@ This is the body.
 Bye.
 ```
 
-And also a copy of *greet.txt*.
+And also a copy of *greet.txt*. Take a look at this for a complete example:
+[index.html.tpl](website/blob/master/static/index.html.tpl#L7).
 
 
 ## Notes

@@ -49,7 +49,7 @@ template() {
 		[[ "$file" =~ .+\.tpl ]] || { cat "$file"; continue; }
 		while IFS=  read -r line
 		do
-			if "$(echo "$line" | grep -q '{{!')"
+			if echo "$line" | grep -q '{{!'
 			then
 				# replace {{!}} commands
 				echo "$line" | sed 's:\s*{{\!\s*\(.*\)\s*}}:\1:g' | sh
