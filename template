@@ -69,15 +69,16 @@ template() {
 while getopts hvo: name
            do
                case $name in
-               h)    usage && exit 0;;
-               v)    version && exit 0;;
-               o)    OUTDIR="$OPTARG";;
-               ?)    usage && exit 1;;
+               h) usage && exit 0;;
+               v) version && exit 0;;
+               o) OUTDIR="$OPTARG" && shift && shift;;
+               ?) usage && exit 1;;
+	       *) args+="$name" ;;
                esac
            done
 
-[[ -d out ]] || mkdir out
-
+[[ -d $OUTDIR ]] || mkdir "$OUTDIR"
+echo $*
 find "$@" -type f | while read -r tpl; do
 echo "$tpl"
 mkdir -p $(dirname "$OUTDIR/$tpl")
