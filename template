@@ -13,6 +13,7 @@ Template lets one use handlebars in your files and paste the output.
 Available options are:
   -h		show this help
   -v		print the version
+  -o		set the output dir (defaults to ./out)
 
 With no path given the default is ..
 
@@ -65,11 +66,12 @@ template() {
 }
 
 # Command line options
-while getopts hv name
+while getopts hvo: name
            do
                case $name in
                h)    usage && exit 0;;
                v)    version && exit 0;;
+               o)    OUTDIR="$OPTARG";;
                ?)    usage && exit 1;;
                esac
            done
@@ -78,7 +80,7 @@ while getopts hv name
 
 find "$@" -type f | while read -r tpl; do
 echo "$tpl"
-mkdir -p $(dirname out/$tpl)
-template "$tpl" > "out/${tpl%.tpl}"
+mkdir -p $(dirname "$OUTDIR/$tpl")
+template "$tpl" > "$OUTDIR/${tpl%.tpl}"
 done
 
