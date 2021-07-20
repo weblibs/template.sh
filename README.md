@@ -24,6 +24,12 @@ recursively, so be carefull, and will generate the same structure in the
 `template static`
 
 will process all files inside *static/* and write them into *out/*.
+To change the output folder use the `-o <folder>` option, it must come
+first:
+
+`template -o web static`
+
+For more information run `template -h` for help.
 
 
 ### Handlebars
