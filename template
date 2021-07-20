@@ -77,11 +77,14 @@ while getopts hvo: name
                esac
            done
 
-[[ -d $OUTDIR ]] || mkdir "$OUTDIR"
-echo $*
-find "$@" -type f | while read -r tpl; do
-echo "$tpl"
-mkdir -p $(dirname "$OUTDIR/$tpl")
-template "$tpl" > "$OUTDIR/${tpl%.tpl}"
-done
+[ -z "$OUTDIR" ] && OUTDIR="out"
+[ -d $OUTDIR ] || mkdir "$OUTDIR"
 
+for dir in $@
+do
+	find "$dir" -type f | while read -r tpl; do
+		reldir="${tpl#$dir}"
+		mkdir -p $(dirname "$OUTDIR/$reldir")
+		template "$tpl" > "$OUTDIR/${reldir%.tpl}"
+	done
+done
