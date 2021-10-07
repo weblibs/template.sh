@@ -55,7 +55,7 @@ template() {
 			if echo "$line" | grep -q '{{!'
 			then
 				# replace {{!}} commands
-				echo "$line" | sed 's:\s*{{\!\s*\(.*\)\s*}}:\1:g' | sh
+				echo "$line" | sed 's:{{\!\(.*\)}}:\1:g' | sh
 			elif echo "$line" | grep -q '{{'
 			then
 				# replace files in {{}}
