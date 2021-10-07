@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
 version() {
-	echo "Template v0.5.0"
+	echo "Template v1.0.2"
 }
 
 usage() {
 	cat << EOF
-template v0.5.0
+template v1.0.2
 Usage: template [options] [path]
 Template lets one use handlebars in your files and paste the output.
 
@@ -47,7 +47,7 @@ EOF
 template() {
 	for file in "$@"
 	do
-		[[ "$file" =~ .+\.tpl ]] || { cat "$file"; continue; }
+		echo "$file" | grep -q .tpl || { cat "$file"; continue; }
 		while IFS=  read -r line
 		do
 			if echo "$line" | grep -q '{{!'
