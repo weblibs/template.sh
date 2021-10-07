@@ -1,12 +1,12 @@
 #!/bin/sh
 
 version() {
-	echo "Template v1.0.2"
+	echo "Template v1.1.1"
 }
 
 usage() {
 	cat << EOF
-template v1.0.2
+template v1.1.1
 Usage: template [options] [path]
 Template lets one use handlebars in your files and paste the output.
 
@@ -55,7 +55,7 @@ template() {
 			if echo "$line" | grep -q '{{!'
 			then
 				# replace {{!}} commands
-				echo "$line" | sed 's:{{\!\(.*\)}}:\1:g' | sh
+				echo "$line" | sed -e 's:{{\!\(.*\)}}:\1:g' -e 's/\\/\\\\/g' | sh
 			elif echo "$line" | grep -q '{{'
 			then
 				# replace files in {{}}
