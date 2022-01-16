@@ -1,7 +1,7 @@
 #!/bin/sh
 
 version() {
-	echo "Template v1.1.1"
+	echo "Template v1.1.2"
 }
 
 usage() {
@@ -47,8 +47,6 @@ EOF
 template() {
 	for file in "$@"
 	do
-		echo "Processing $file" >&2
-		
 		echo "$file" | grep -q .tpl || { cat "$file"; continue; }
 		while IFS=  read -r line
 		do
@@ -82,9 +80,14 @@ while getopts hvo: name
 [ -z "$OUTDIR" ] && OUTDIR="out"
 [ -d $OUTDIR ] || mkdir "$OUTDIR"
 
-for dir in $@
+files="$@"
+[ -z $files ] && files="."
+
+for dir in $files
 do
 	find "$dir" -type f | while read -r tpl; do
+		echo "Processing $tpl" >&2
+		
 		reldir="${tpl#$dir}"
 		mkdir -p $(dirname "$OUTDIR/$reldir")
 		template "$tpl" > "$OUTDIR/${reldir%.tpl}"
