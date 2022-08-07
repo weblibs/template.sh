@@ -45,51 +45,51 @@ EOF
 }
 
 template() {
-	for file in "$@"
+	[ -z $1 ] || echo "$1" | grep -q .tpl || { cat "$1"; return; }
+	while IFS=  read -r line
 	do
-		echo "$file" | grep -q .tpl || { cat "$file"; continue; }
-		while IFS=  read -r line
-		do
-			if echo "$line" | grep -q '{{!'
+		if echo "$line" | grep -q '{{!'
+		then
+			pre="${line%\{\{*}"
+			rest="${line#*\{\{\!}"
+			if echo "$line" | grep -q '}}'
 			then
-				# replace {{!}} commands
-				echo "$line" | sed -e 's:{{\!\(.*\)}}:\1:g' | sh # -e 's/\\/\\\\/g'
-			elif echo "$line" | grep -q '{{'
-			then
-				# replace files in {{}}
-				template $(echo "$line" | sed 's:{{\(.*\)}}:\1:g')
+				cmd="${rest%\}\}*}"
+				rest="${rest#*\}\}}"
 			else
-				printf "%s\n" "$line"
+				cmd="$rest"
+				while IFS=  read -r l
+				do
+					cmd="$cmd\n${l%\}\}*}"
+					echo "$l" | grep -q '}}' && rest="${l#*\}\}}" && break
+				done
 			fi
-		done < "$file"
+			printf -- "$pre"
+			printf -- "$cmd" | sh
+			printf -- "$rest"
+		elif echo "$line" | grep -q '{{'
+		then
+			# replace files in {{}}
+			template $(echo "$line" | sed 's:{{\(.*\)}}:\1:g')
+		else
+			printf -- "%s\n" "$line"
+		fi
 	done
 }
 
 # Command line options
-while getopts hvo: name
-           do
-               case $name in
-               h) usage && exit 0;;
-               v) version && exit 0;;
-               o) OUTDIR="$OPTARG" && shift && shift;;
-               ?) usage && exit 1;;
-	       *) args+="$name" ;;
-               esac
-           done
-
-[ -z "$OUTDIR" ] && OUTDIR="out"
-[ -d $OUTDIR ] || mkdir "$OUTDIR"
-
-files="$@"
-[ -z $files ] && files="."
-
-for dir in $files
+while getopts hv: name
 do
-	find "$dir" -type f | while read -r tpl; do
-		echo "Processing $tpl" >&2
-		
-		reldir="${tpl#$dir}"
-		mkdir -p $(dirname "$OUTDIR/$reldir")
-		template "$tpl" > "$OUTDIR/${reldir%.tpl}"
-	done
+	case $name in
+		h) usage && exit 0;;
+		v) version && exit 0;;
+		?) usage && exit 1;;
+		*) args+="$name" ;;
+	esac
 done
+if [ -f "$1" ]
+then
+	template < "$1"
+else
+	template
+fi
