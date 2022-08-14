@@ -11,9 +11,9 @@ Usage: template [options] [path]
 Template lets one use handlebars in your files and paste the output.
 
 Available options are:
-  -h		show this help
-  -v		print the version
-  -o		set the output dir (defaults to ./out)
+  -hshow this help
+  -vprint the version
+  -oset the output dir (defaults to ./out)
 
 With no path given the default is ..
 
@@ -44,14 +44,17 @@ SOFTWARE.
 EOF
 }
 
+debug() {
+	[ "$DEBUG" ] && echo "DEBUG: $*" >&2
+}
+
 template() {
-	[ -z $1 ] || echo "$1" | grep -q .tpl || { cat "$1"; return; }
 	while IFS=  read -r line
 	do
-		if echo "$line" | grep -q '{{!'
+		if echo "$line" | grep -q '{{'
 		then
 			pre="${line%\{\{*}"
-			rest="${line#*\{\{\!}"
+			rest="${line#*\{\{}"
 			if echo "$line" | grep -q '}}'
 			then
 				cmd="${rest%\}\}*}"
@@ -64,13 +67,11 @@ template() {
 					echo "$l" | grep -q '}}' && rest="${l#*\}\}}" && break
 				done
 			fi
+
+			debug "running command: $cmd"
 			printf -- "$pre"
-			printf -- "$cmd" | sh
+			printf -- "$cmd $args" | sh
 			printf -- "$rest"
-		elif echo "$line" | grep -q '{{'
-		then
-			# replace files in {{}}
-			template $(echo "$line" | sed 's:{{\(.*\)}}:\1:g')
 		else
 			printf -- "%s\n" "$line"
 		fi
@@ -78,18 +79,24 @@ template() {
 }
 
 # Command line options
-while getopts hv: name
+file="$1"
+shift
+while [ "$1" ]
 do
-	case $name in
-		h) usage && exit 0;;
-		v) version && exit 0;;
-		?) usage && exit 1;;
-		*) args+="$name" ;;
+	case "$1" in
+		-h|--help) usage && exit 0;;
+		-v|--version) version && exit 0;;
+		*) args+=" $1" ;;
 	esac
+	shift
 done
-if [ -f "$1" ]
+
+debug "running $file with args $args"
+if [ -f "$file" ]
 then
-	template < "$1"
+	echo "$file" | grep -q .tpl || { cat "$file"; return; }
+	template < "$file"
 else
 	template
 fi
+
