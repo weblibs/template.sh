@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 version() {
-	echo "Template v1.1.4"
+	echo "Template v1.1.5"
 }
 
 usage() {
@@ -80,21 +80,19 @@ template() {
 
 # Command line options
 file="$1"
-shift
-while [ "$1" ]
+while [ shift ]
 do
 	case "$1" in
 		-h|--help) usage && exit 0;;
 		-v|--version) version && exit 0;;
 		*) args+=" $1" ;;
 	esac
-	shift
 done
 
 debug "running $file with args $args"
 if [ -f "$file" ]
 then
-	echo "$file" | grep -q .tpl || { cat "$file"; return; }
+	echo "$file" | grep -q .tpl || { cat "$file"; exit 0; }
 	template < "$file"
 else
 	template
