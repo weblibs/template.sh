@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 version() {
-	echo "Template v1.1.5"
+	echo "Template v2.0.1"
 }
 
 usage() {
