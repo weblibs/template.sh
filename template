@@ -68,20 +68,21 @@ template() {
 				done
 			fi
 
-			debug "running command: $cmd"
-			printf -- "$pre"
-			printf -- "$cmd $args" | sh
-			printf -- "$rest"
+			debug "running command: $cmd $args"
+			echo "$pre"
+			echo "$cmd $args" | sh
+			echo "$rest"
 		else
-			printf -- "%s\n" "$line"
+			echo "$line"
 		fi
 	done
 }
 
 # Command line options
 file="$1"
-while [ shift ]
+while [ $1 ]
 do
+	shift
 	case "$1" in
 		-h|--help) usage && exit 0;;
 		-v|--version) version && exit 0;;
